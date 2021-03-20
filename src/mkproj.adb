@@ -1,89 +1,84 @@
-with ada.text_io;	      use ada.text_io;
-with ada.directories;   use ada.directories;
-with ada.command_line;  use ada.command_line;
-with ada.text_io;	      use ada.text_io;
-with ada.strings.fixed; use ada.strings.fixed;
-with gnat.os_lib;       use gnat.os_lib;
+with Ada.Text_IO;	      use Ada.Text_IO;
+with Ada.Directories;   use Ada.Directories;
+with Ada.Command_Line;  use Ada.Command_Line;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
--- This code makes a new project based on all the files in the template directory,
--- replacing __PROJECTNAME__ with the project name given on stdin
+procedure Mkproj is
+   Template_Config_Root : constant String := Containing_Directory(Containing_Directory(Containing_Directory(Command_Name)));
+   -- TODO print the available template choices, then ask which is desired
+   Template_Choice : constant String := "ada_makefile";
+   Template_Dir : constant String := Compose(Compose(Template_Config_Root, "templates"), Template_Choice);
+   PName_Placeholder : constant String := "__PROJECTNAME__";
+begin
 
-procedure mkproj is
-   templateDir : constant string := "ada_makefile";
-   pname_placeholder : constant string := "__PROJECTNAME__";
-begin -- mkexample
-
-   Put_Line ("Something: " & command_name);
-	put_line ("The project will be created in: " & current_directory);
-   put("Enter a name for the project: ");
+	Put_Line ("The project will be created in: " & current_directory);
+   Put ("Enter a name for the project: ");
 
    declare
-	   project_name : string := get_line;
+	   Project_Name : String := Get_Line;
 
-      procedure translateFile(outputDir : string; fileName : string) is
-	      input_file : ada.text_io.file_type;
-	      output_file : ada.text_io.file_type;
+      procedure Translate_File (Output_Dir : String; File_Name : String) is
+	      Input_File : Ada.Text_IO.File_Type;
+	      Output_File : Ada.Text_IO.File_Type;
 
-         function replace_projectname (line : string) return string is
-	         pname_begin : natural := index(line, pname_placeholder);
+         function Replace_Projectname (Line : String) return String is
+	         PName_Begin : Natural := Index(line, PName_Placeholder);
          begin
-	         if pname_begin /= 0 then
+	         if PName_Begin /= 0 then
 	            declare
-	               pname_end : natural := pname_begin + pname_placeholder'length;
+	               PName_End : Natural := PName_Begin + PName_Placeholder'Length;
 	            begin
-		            return replace_slice(line,pname_begin,pname_end-1,project_name);
+		            return Replace_Slice (Line,PName_Begin,PName_End-1,Project_Name);
 	            end;
 	         else
-	            return line;
+	            return Line;
 	         end if;
-	      end replace_projectname;
+	      end Replace_Projectname;
 
-         outputFileName : string := replace_projectname(fileName);
-      begin -- translateFile
+         Output_FileName : String := Replace_Projectname (File_Name);
+      begin -- Translate_File
 
-	      open( file => input_file,
-			mode => in_file,
-			name => compose(compose(compose(containing_directory(containing_directory(containing_directory(command_name))), "templates"), templateDir), fileName) );
-			set_input(input_file);
+	      Open (File => Input_File,
+			      Mode => In_File,
+			      Name => Compose (Template_Dir, File_Name));
+			Set_Input (Input_File);
 
-	      create 	(
-	  			file => output_file,
-	  			mode => out_file,
-	  			name => compose(outputDir, outputFileName)
-	  		   );
+	      Create (File => Output_File,
+	  			     Mode => Out_File,
+	  			     Name => Compose (Output_Dir, Output_FileName));
 
-	      while not end_of_file loop
-	         put_line(output_file, replace_projectname(get_line));
+	      while not End_Of_File loop
+	         Put_Line (Output_File, Replace_Projectname (Get_Line));
 	      end loop;
 
-	      close (output_file);
-	      close (input_file);
+	      Close (Output_File);
+	      Close (Input_File);
 
-      end translateFile;
+      end Translate_File;
 	begin
-	   create_directory ( project_name );
+	   Create_Directory (Project_Name);
 
       declare
-         search : Search_Type;
+         Search : Search_Type;
       begin
-         Start_Search (Search    => search, 
-         Directory => compose(compose(containing_directory(containing_directory(containing_directory(command_name))), "templates"), templateDir),
-         Pattern   => "");
-         while More_Entries(search) loop
+         Start_Search (Search    => Search, 
+                       Directory => Template_Dir,
+                       Pattern   => "");
+         while More_Entries (Search) loop
             declare
-               dir_entry : Directory_Entry_Type;
+               Dir_Entry : Directory_Entry_Type;
             begin
-               Get_Next_Entry (Search          => search,
-               Directory_Entry => dir_entry );
-               if Kind( dir_entry ) = Ordinary_File then
+               Get_Next_Entry (Search          => Search,
+                               Directory_Entry => Dir_Entry );
+               if Kind (Dir_Entry) = Ordinary_File then
                   declare
-                     filename : string := simple_name(dir_entry);
+                     File_Name : String := Simple_Name (Dir_Entry);
                   begin
-	                  translateFile( outputDir => project_name, fileName => filename );
+	                  Translate_File (Output_Dir => Project_Name, File_Name => File_Name );
 	               end;
                end if;
             end;
          end loop;
       end;
    end;
-end mkproj;
+end Mkproj;
