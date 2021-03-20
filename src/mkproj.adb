@@ -7,7 +7,7 @@ procedure Mkproj is
    Template_Config_Root : constant String := Containing_Directory(Containing_Directory(Containing_Directory(Command_Name)));
    -- TODO print the available template choices, then ask which is desired
    Template_Choice : constant String := "ada_makefile";
-   Template_Dir : constant String := Compose(Compose(Template_Config_Root, "templates"), Template_Choice);
+   Template_Dir : constant String := Compose(Compose(Template_Config_Root, "project_templates"), Template_Choice);
    PName_Placeholder : constant String := "__PROJECTNAME__";
 begin
 
