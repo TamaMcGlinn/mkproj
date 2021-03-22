@@ -7,15 +7,19 @@ private
 
    PName_Placeholder : constant String := "__PROJECTNAME__";
 
+   type Project_Type (Name_Length : Positive) is record
+      Name : String (1 .. Name_Length);
+   end record;
+
    procedure Create_Directory_From_Template
-     (Project_Name     : String; Target_Directory : String;
+     (Project          : Project_Type; Target_Directory : String;
       Source_Directory : String);
 
    function Replace_Projectname
-     (Project_Name : String; Line : String) return String;
+     (Project : Project_Type; Line : String) return String;
 
    procedure Translate_File
-     (Project_Name : String; Input_Dir : String; Output_Dir : String;
-      File_Name    : String);
+     (Project   : Project_Type; Input_Dir : String; Output_Dir : String;
+      File_Name : String);
 
 end Copier;

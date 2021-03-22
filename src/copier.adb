@@ -6,13 +6,14 @@ with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 package body Copier is
 
    procedure Create_Project (Project_Name : String; Template_Dir : String) is
+      Project : Project_Type :=
+        (Name_Length => Project_Name'Last, Name => Project_Name);
    begin
-      Create_Directory_From_Template
-        (Project_Name, Project_Name, Template_Dir);
+      Create_Directory_From_Template (Project, Project_Name, Template_Dir);
    end Create_Project;
 
    procedure Create_Directory_From_Template
-     (Project_Name     : String; Target_Directory : String;
+     (Project          : Project_Type; Target_Directory : String;
       Source_Directory : String)
    is
       Search : Search_Type;
@@ -32,10 +33,9 @@ package body Copier is
                      File_Name : String := Simple_Name (Dir_Entry);
                   begin
                      Translate_File
-                       (Project_Name => Project_Name,
-                        Input_Dir    => Source_Directory,
-                        Output_Dir   => Target_Directory,
-                        File_Name    => File_Name);
+                       (Project, Input_Dir => Source_Directory,
+                        Output_Dir         => Target_Directory,
+                        File_Name          => File_Name);
                   end;
                when Directory =>
                   declare
@@ -49,9 +49,8 @@ package body Copier is
                              Source_Directory & "/" & Dir_Name;
                         begin
                            Create_Directory_From_Template
-                             (Project_Name     => Project_Name,
-                              Target_Directory => New_Target_Dir,
-                              Source_Directory => New_Source_Dir);
+                             (Project, Target_Directory => New_Target_Dir,
+                              Source_Directory          => New_Source_Dir);
                         end;
                      end if;
                   end;
@@ -65,7 +64,7 @@ package body Copier is
    end Create_Directory_From_Template;
 
    function Replace_Projectname
-     (Project_Name : String; Line : String) return String
+     (Project : Project_Type; Line : String) return String
    is
       PName_Begin : Natural := Index (Line, PName_Placeholder);
    begin
@@ -74,7 +73,7 @@ package body Copier is
             PName_End : Natural := PName_Begin + PName_Placeholder'Length;
          begin
             return
-              Replace_Slice (Line, PName_Begin, PName_End - 1, Project_Name);
+              Replace_Slice (Line, PName_Begin, PName_End - 1, Project.Name);
          end;
       else
          return Line;
@@ -82,13 +81,13 @@ package body Copier is
    end Replace_Projectname;
 
    procedure Translate_File
-     (Project_Name : String; Input_Dir : String; Output_Dir : String;
-      File_Name    : String)
+     (Project   : Project_Type; Input_Dir : String; Output_Dir : String;
+      File_Name : String)
    is
       Input_File      : Ada.Text_IO.File_Type;
       Output_File     : Ada.Text_IO.File_Type;
       Output_FileName : String :=
-        Replace_Projectname (Project_Name => Project_Name, Line => File_Name);
+        Replace_Projectname (Project => Project, Line => File_Name);
    begin
 
       Open
@@ -101,7 +100,7 @@ package body Copier is
          Name => Compose (Output_Dir, Output_FileName));
 
       while not End_Of_File loop
-         Put_Line (Output_File, Replace_Projectname (Project_Name, Get_Line));
+         Put_Line (Output_File, Replace_Projectname (Project, Get_Line));
       end loop;
 
       Close (Output_File);
