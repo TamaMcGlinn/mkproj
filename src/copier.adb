@@ -1,12 +1,11 @@
 with Ada.Text_IO;       use Ada.Text_IO;
 with Ada.Directories;   use Ada.Directories;
-with Ada.Command_Line;  use Ada.Command_Line;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
 package body Copier is
 
    procedure Create_Project (Project_Name : String; Template_Dir : String) is
-      Project : Project_Type :=
+      Project : constant Project_Type :=
         (Name_Length => Project_Name'Last, Name => Project_Name);
    begin
       Create_Directory_From_Template (Project, Project_Name, Template_Dir);
@@ -30,7 +29,7 @@ package body Copier is
             case Kind (Dir_Entry) is
                when Ordinary_File =>
                   declare
-                     File_Name : String := Simple_Name (Dir_Entry);
+                     File_Name : constant String := Simple_Name (Dir_Entry);
                   begin
                      Translate_File
                        (Project, Input_Dir => Source_Directory,
@@ -39,13 +38,13 @@ package body Copier is
                   end;
                when Directory =>
                   declare
-                     Dir_Name : String := Simple_Name (Dir_Entry);
+                     Dir_Name : constant String := Simple_Name (Dir_Entry);
                   begin
                      if Dir_Name /= "." and Dir_Name /= ".." then
                         declare
-                           New_Target_Dir : String :=
+                           New_Target_Dir : constant String :=
                              Target_Directory & "/" & Dir_Name;
-                           New_Source_Dir : String :=
+                           New_Source_Dir : constant String :=
                              Source_Directory & "/" & Dir_Name;
                         begin
                            Create_Directory_From_Template
@@ -66,11 +65,12 @@ package body Copier is
    function Replace_Projectname
      (Project : Project_Type; Line : String) return String
    is
-      PName_Begin : Natural := Index (Line, PName_Placeholder);
+      PName_Begin : constant Natural := Index (Line, PName_Placeholder);
    begin
       if PName_Begin /= 0 then
          declare
-            PName_End : Natural := PName_Begin + PName_Placeholder'Length;
+            PName_End : constant Natural :=
+              PName_Begin + PName_Placeholder'Length;
          begin
             return
               Replace_Slice (Line, PName_Begin, PName_End - 1, Project.Name);
@@ -86,7 +86,7 @@ package body Copier is
    is
       Input_File      : Ada.Text_IO.File_Type;
       Output_File     : Ada.Text_IO.File_Type;
-      Output_FileName : String :=
+      Output_FileName : constant String :=
         Replace_Projectname (Project => Project, Line => File_Name);
    begin
 
