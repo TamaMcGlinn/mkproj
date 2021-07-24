@@ -1,5 +1,5 @@
-with Ada.Text_IO;     use Ada.Text_IO;
-with Ada.Directories; use Ada.Directories;
+with Ada.Text_IO;      use Ada.Text_IO;
+with Ada.Command_Line; use Ada.Command_Line;
 with Ada.Environment_Variables;
 
 with Copier;
@@ -7,17 +7,19 @@ with Copier;
 procedure Mkproj is
    Home          : constant String := Ada.Environment_Variables.Value ("HOME");
    Template_Root : constant String := Home & "/.config/mkproj/";
-   -- TODO print the available template choices, then ask which is desired
 begin
-   Put_Line ("The project will be created in: " & Current_Directory);
-   Put ("Which template do you want to use? ");
+   if Argument_Count /= 2 then
+      Put_Line ("mkproj usage:");
+      Put_Line ("mkproj project_template project_name");
+      Put_Line
+        ("e.g. mkproj project_templates/cpp_makefile my_foo_experiment");
+      Set_Exit_Status (Failure);
+      return;
+   end if;
    declare
-      Template_Dir : constant String :=
-        Template_Root & "/project_templates/" & Get_Line;
-      -- TODO allow multiple configurable project_templates
+      Template_Dir : constant String := Template_Root & "/" & Argument (1);
    begin
-      Put ("Enter a name for the project: ");
       Copier.Create_Project
-        (Project_Name => Get_Line, Template_Dir => Template_Dir);
+        (Project_Name => Argument (2), Template_Dir => Template_Dir);
    end;
 end Mkproj;
