@@ -27,7 +27,12 @@ ln -s ${PWD}/bin/mkproj ~/.local/bin/
 ```
 
 To get bash completion, add `source /path/to/mkproj/mkproj-completion.bash`
-to your `~/.bashrc` file.
+to your `~/.bashrc` file. You could also add 'aliases' for your favourite templates, e.g.:
+
+```
+mkada() { mkproj project_templates/ada_gprbuild "$1"; cd "$1"; }
+mkcpp() { mkproj project_templates/cpp_makefile "$1"; cd "$1"; }
+```
 
 Install some project template collections:
 
@@ -65,11 +70,4 @@ E.g. `mkproj custom_project1 foo` will create a foo directory
 containing the files from that template dir, but with `__PROJECTNAME__`
 substituted with foo.
 
-Since the first parameter is the project template, you could also add aliases
-for your favourite templates to your ~/.bash_aliases, e.g.:
-
-```
-alias mkada='mkproj project_templates/ada_gprbuild'
-alias mkcpp='mkproj project_templates/cpp_makefile'
-```
 
