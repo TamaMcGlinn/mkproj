@@ -3,7 +3,7 @@
 Language- and editor agnostic project creation tool.
 
 Make a project from a prewritten template,
-replacing __PROJECTNAME__ in filenames and their contents.
+replacing `__PROJECTNAME__` in filenames and their contents.
 
 You can create your own, separate repository containing templates.
 
@@ -62,7 +62,7 @@ For example, if `~/.config/mkproj` looks like this:
 
 Then you can do `mkproj cu[tab]` to cycle through your two custom_projects.
 E.g. `mkproj custom_project1 foo` will create a foo directory
-containing the files from that template dir, but with __PROJECTNAME__
+containing the files from that template dir, but with `__PROJECTNAME__`
 substituted with foo.
 
 Since the first parameter is the project template, you could also add aliases
