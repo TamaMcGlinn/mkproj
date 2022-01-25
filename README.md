@@ -6,6 +6,7 @@ Make a project from a prewritten template,
 replacing `__PROJECTNAME__` in filenames and their contents.
 
 You can create your own, separate repository containing templates.
+[Here is mine](https://github.com/TamaMcGlinn/project_templates)
 
 ## Prerequisites
 
